@@ -75,6 +75,7 @@
 #define TEST_LIST               const struct acutest_test_ acutest_list_[]
 
 
+
 /* Macros for testing whether an unit test succeeds or fails. These macros
  * can be used arbitrarily in functions implementing the unit tests.
  *
@@ -1821,6 +1822,10 @@ main(int argc, char** argv)
  #endif
 #else
     acutest_colorize_ = 0;
+#endif
+    
+#ifdef ACUTEST_DISABLE_COLOR
+    acutest_colorize_=0;
 #endif
 
     /* Count all test units */
