@@ -77,28 +77,36 @@
  */
 #define TEST_LIST               const struct acutest_test_ acutest_list_main_test_set[]
 /**
- Multifile setup. Idea - each file exports own tests set and in some separated file you combine tests ti single test list
- For example you want to have two test files: testDB.cpp and testUtils.cpp
- Those files will contain actual tests. All those files should have: #define TEST_NO_MAIN  before #include "acutest.hpp" to disable generation the test main function, because it should be only one.
- At the bottom of each test file you should write module initializer that will register tests of this file:
- 
- ACUTEST_MODULE_INITIALIZER(testDb_module) { //testDb_module - just arbitrary string that should be unique identifier for the test file
-     ACUTEST_ADD_TEST_(testDbInitFunction); // testDbInitFunction - pointer to test function
+ Set up multifile testing framework.
+
+ Each file exports its own set of tests, which are then combined into a single test list in a separate file.
+ For example, if you have two test files: `testDB.cpp` and `testUtils.cpp`, these files will contain the actual tests.
+ To disable the generation of the main test function (since there should only be one), add `#define TEST_NO_MAIN` before `#include "acutest.hpp"` in each test file.
+ At the bottom of each test file, register the tests using a module initializer:
+
+ ```cpp
+ // testDB.cpp
+ ACUTEST_MODULE_INITIALIZER(testDb_module) {
+     ACUTEST_ADD_TEST_(testDbInitFunction);
      ACUTEST_ADD_TEST_(test1);
-     ...//all other tests
+     // Add other tests here
  }
+```
  
- Create third file mainTestFile.cpp that will have the following:
- 
+ Create a third file, mainTestFile.cpp, to combine the test modules:
+ // mainTestFile.cpp
  #include "acutest.hpp"
- 
+
  IMPORT_ACUTEST_MODULE(testDb_module);
  IMPORT_ACUTEST_MODULE(testUtils_module);
 
- ACUTEST_MODULES(ACUTEST_MODULE(testDb_module)
-                 ,ACUTEST_MODULE(testUtils_module)
- )
+ ACUTEST_MODULES(
+     ACUTEST_MODULE(testDb_module),
+     ACUTEST_MODULE(testUtils_module)
+ );
+
  TEST_LIST = {0};
+
  */
 
 /* Macros for testing whether an unit test succeeds or fails. These macros
