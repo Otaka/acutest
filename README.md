@@ -138,6 +138,48 @@ For a basic test suites this is more or less all you need to know. However
 Acutest provides some more macros which can be useful in some specific
 situations. We cover them in the following sub-sections.
 
+### Multifile tests
+
+ Each file can export its own set of tests, which are then combined into a single test list in a separate file.
+ 
+ For example, if you have two test files: `testDB.cpp` and `testUtils.cpp`, these files will contain the actual tests.
+ 
+ To disable the generation of the main test function (since there should only be one), add `#define TEST_NO_MAIN` before `#include "acutest.hpp"` in each test file.
+ 
+ At the bottom of each test file, register the tests using a module initializer:
+
+ ```cpp
+// testDB.cpp
+
+#define TEST_NO_MAIN
+#include "acutest.hpp"
+
+void test1(){...}
+void test2(){...}
+
+ // testDB.cpp
+ ACUTEST_MODULE_INITIALIZER(testDb_module) { 
+    ACUTEST_ADD_TEST_(test1);
+    ACUTEST_ADD_TEST_(test2);
+    // Add other tests here
+ }
+```
+ 
+ Create a third file - mainTestFile.cpp or something like this, to combine the test modules:
+ ```cpp
+ // mainTestFile.cpp
+ #include "acutest.hpp"
+
+ IMPORT_ACUTEST_MODULE(testDb_module);
+ IMPORT_ACUTEST_MODULE(testUtils_module);
+
+ ACUTEST_MODULES(
+     ACUTEST_MODULE(testDb_module),
+     ACUTEST_MODULE(testUtils_module)
+ );
+
+ TEST_LIST = {0};
+```
 ### Aborting on a Check Failure
 
 There is a macro `TEST_ASSERT` which is very similar to `TEST_CHECK` but, if it
